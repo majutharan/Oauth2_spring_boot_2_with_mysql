@@ -1,13 +1,18 @@
 package com.codetech.oauth2.controller;
 
-import com.codetech.oauth2.model.User;
+import com.codetech.oauth2.model.UserModel;
 import com.codetech.oauth2.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 /**
  * Created by A Majutharan.
@@ -23,7 +28,23 @@ public class UserController {
     @GetMapping(path = "/get-all-users")
     public @ResponseBody
     ResponseEntity<Iterable> getAllUsers() {
-        Iterable<User> users = userRepository.findAll();
+        Iterable<UserModel> users = userRepository.findAll();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping(path = "/view-user")
+    public @ResponseBody ResponseEntity<Optional> viewUser(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(userRepository.findById(id));
+    }
+
+    @GetMapping(path = "/logout")
+    public @ResponseBody ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        authentication.setAuthenticated(false);
+        new SecurityContextLogoutHandler().logout(request,response,authentication);
+        SecurityContextHolder.clearContext();
+        request.logout();
+        request.getSession().invalidate();
+        return ResponseEntity.ok("successfully logout");
     }
 }

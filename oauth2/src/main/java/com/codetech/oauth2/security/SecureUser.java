@@ -1,11 +1,11 @@
 package com.codetech.oauth2.security;
 
 
+import com.codetech.oauth2.dto.AuthResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-
 import java.util.Collection;
 
 /**
@@ -16,7 +16,8 @@ import java.util.Collection;
 @Getter
 @Setter
 public class SecureUser extends User {
-    private int id;
+    private Long id;
+    private AuthResponse authResponse;
 
     public SecureUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
